@@ -1,9 +1,11 @@
 import React from 'react';
-import Navigation from './app/navigations/Navigation';
+import { View, Button, AsyncStorage, useEffect } from 'react-native';
+import Navigation from './app/navigations/Navigation'
 
-export default function App () {  
+function App() {
 
-  return(    
-    <Navigation></Navigation>
-  );
+  return <Navigation></Navigation>
+
 }
+
+export default App

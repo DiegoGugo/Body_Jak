@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, FlatList } from 'react-native';
 import { ListItem } from 'react-native-elements';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
-import BluetoothSerial from 'react-native-bluetooth-serial-next';
+//import BluetoothSerial from 'react-native-bluetooth-serial-next';
 import Empty from './Empty';
 import Toggle from './Toggle';
 
@@ -88,6 +88,6 @@ function Lista() {
         </View>
     );
 
-}
+} 
 
 export default Lista;

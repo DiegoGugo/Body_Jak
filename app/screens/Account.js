@@ -1,41 +1,61 @@
-import React, { useEffect , useState} from 'react';
-import { ScrollView, View, Text, StyleSheet, Dimensions } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { ScrollView, View, Text, StyleSheet, Dimensions, AsyncStorage } from 'react-native';
+import { Button } from 'react-native-elements';
 import { Avatar, Image, Icon, Divider } from 'react-native-elements';
+import axios from 'axios'
 
 function Informacion(props) {
 
-    const { nameIcon, text, description } = props;
+    const { text, description } = props;
 
     return (
         <View style={styles.infoC}>            
-            <Text style={{ fontSize: 16, fontFamily: 'monospace', fontWeight: 'bold' }}> {description}:</Text>
-            <Text style={{ fontSize: 16 }}> {text}</Text>
+            <Text style={{ fontSize: 16, fontFamily: 'monospace', fontWeight: 'bold' }}> {description}:</Text>            
+            <Text style={{ fontSize: 16 }}> {text}</Text>            
         </View>
     );
 }
 
-export default function Account() {    
+export default function Account(props) {
 
-    const [data, setData]=useState({});
+    const [data, setData] = useState({});
+    const [user, setUser] = useState('');
+    const { navigation } = props;    
+
+    const getToken = async () => {
+        const token = await AsyncStorage.getItem('token');
+        axios.post("https://health-corporis.herokuapp.com/api/infoCuenta", {//192.168.1.68:4000  https://health-corporis.herokuapp.com/api/infoCuenta
+            token
+        })
+        .then(
+            (res, err) => {
+                setData(res.data.data)
+                setUser(res.data.data.Usuario)
+                if (err) {
+                    console.log('Error data message')
+                }
+            }
+        )
+    };
+
+    const deleteToken = async () => {
+        await AsyncStorage.removeItem('token')
+        navigation.navigate('Auth')
+    }
 
     useEffect(() => {
-        fetch('http://192.168.1.64:3000/api/account',{
-            method:'GET'
-        })
-        .then(res => res.json())
-        .then(data=>setData(data))
-        .catch(err=>console.error(err));
+        getToken();
     }, []);
 
-    function pintar(){
-        const info=data;
-        const currentcies = Object.keys(info);    
-        console.log(currentcies)             
-        return currentcies.map(c=>(            
-                <Informacion key={c} text={info[c].info} description={info[c].description}></Informacion>                            
-        ));
-
-    }    
+    function pintar() {
+        const info = data;
+        if (info != ['data']) {
+            const currentcies = Object.keys(info);
+            return currentcies.map(c => (
+                <Informacion key={c} description={c} text={info[c]} />
+            ));
+        }
+    }
 
     return (
         <ScrollView style={styles.container}>
@@ -50,7 +70,7 @@ export default function Account() {
                         />
                     </View>
                     <View style={styles.nameContainer}>
-                        <Text style={styles.userNameText}>OrcoLujoso</Text>
+                        <Text style={styles.userNameText}>Bienvenido {user}</Text>
                     </View>
                 </View>
             </Image>
@@ -58,8 +78,15 @@ export default function Account() {
                 <Text style={{ fontSize: 18, fontFamily: 'sans-serif', marginBottom: 15, textAlign: 'center' }}>Informacion de la cuenta</Text>
                 {pintar()}
             </View>
+            <Button
+                title='Cerrar Sesión'
+                buttonStyle={styles.Fsesion}
+                containerStyle={{ alignItems: 'center', marginBottom:20}}
+                onPress={deleteToken}
+            />
         </ScrollView>
     );
+
 }
 
 const styles = StyleSheet.create({
@@ -94,7 +121,12 @@ const styles = StyleSheet.create({
     },
     infoC: {
         flexDirection: 'row',
-        marginLeft: 18,     
-        marginBottom:13 
+        marginLeft: 18,
+        marginBottom: 13
+    },
+    Fsesion: {
+        backgroundColor: '#FA0101',
+        width: Dimensions.get('window').width * .65,
+        alignContent: 'center'
     }
 });
